@@ -1,0 +1,17 @@
+{
+  "name": "app-template",
+  "standard": "1.0.0",
+  "profiles": [
+    "web-static"
+  ],
+  "docs": "docs/BASIC-SPECS.md",
+  "appSpecs": "docs/APP-SPECS.md",
+  "metrics": "site/test-metrics.json",
+  "deviations": [],
+  "commands": {
+    "unit": "pnpm test",
+    "e2e": "pnpm test:e2e",
+    "metrics": "pnpm metrics",
+    "docs": "pnpm publish-site && pnpm check:docs"
+  }
+}
