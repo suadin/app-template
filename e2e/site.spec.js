@@ -19,7 +19,7 @@ const METRICS = {
   },
 };
 
-async function open(page, latest = '1.1.0') {
+async function open(page, latest = '1.1.1') {
   await page.route('**/test-metrics.json', (route) => route.fulfill({ json: METRICS }));
   if (latest === null) {
     await page.route('**/version.json', (route) => route.abort());
@@ -150,7 +150,7 @@ test('[BASIC-VERSION-01] the app version opens SPECS and stays neutral', async (
 
 test('[BASIC-VERSION-02] the Basic Specs version opens BASIC SPECS', async ({ page }) => {
   await open(page);
-  await expect(page.locator('#basic-version')).toHaveText('1.1.0');
+  await expect(page.locator('#basic-version')).toHaveText('1.1.1');
   await page.locator('#basic-specs').click();
   await expect(page).toHaveURL(/#\/docs\/basic-specs$/);
   await expect(page.locator('#reader-title')).toHaveText('BASIC SPECS');

@@ -3,9 +3,9 @@
     "tests": 10,
     "failures": 0,
     "coverage": 77.63,
-    "measuredAt": "2026-10-27T22:21",
-    "durationSeconds": 0.068,
-    "perTest": 0.0068
+    "measuredAt": "2026-10-27T22:56",
+    "durationSeconds": 0.069,
+    "perTest": 0.0069
   },
   "e2e": {
     "tests": 17,
@@ -13,8 +13,8 @@
     "coverage": 50,
     "coveredLines": 260,
     "totalLines": 520,
-    "measuredAt": "2026-10-27T22:21",
-    "durationSeconds": 2.915,
-    "perTest": 0.1715
+    "measuredAt": "2026-10-27T22:56",
+    "durationSeconds": 3.333,
+    "perTest": 0.1961
   }
 }
