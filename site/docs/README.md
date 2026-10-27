@@ -1,8 +1,8 @@
 # App Template
 
 A vanilla static starter that follows [Basic Specs](https://github.com/suadin/basic-specs).
-The content is Lorem Ipsum; the footer, reader, deep links, tooltips, dark mode and
-test metrics are real.
+The content is Lorem Ipsum; the six-item footer, version states, reader, deep links,
+tooltips, dark mode and test metrics are real. SPECS starts with a Changelog page.
 
 Use this repository with **Use this template**, then replace the Lorem Ipsum with your
 app. Keep the structure, the footer, the reader and the conformance check.
