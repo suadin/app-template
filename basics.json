@@ -1,6 +1,6 @@
 {
   "name": "app-template",
-  "standard": "1.0.2",
+  "standard": "1.1.0",
   "profiles": [
     "web-static"
   ],
@@ -13,5 +13,7 @@
     "e2e": "pnpm test:e2e",
     "metrics": "pnpm metrics",
     "docs": "pnpm publish-site && pnpm check:docs"
-  }
+  },
+  "appVersion": "1.0.0",
+  "runtime": "site/basic-specs.json"
 }

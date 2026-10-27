@@ -62,7 +62,7 @@ export function lineCoverage(root, baseURL) {
     for (const entry of entries) {
       if (!entry.url.startsWith(baseURL) || !entry.url.endsWith('.js')) continue;
       const name = new URL(entry.url).pathname.replace(/^\//, '');
-      if (!['app.js', 'logic.js', 'reader.js'].includes(name)) continue;
+      if (!['app.js', 'logic.js', 'reader.js', 'version.js'].includes(name)) continue;
       const current = byFile.get(name) ?? { source: entry.source, ranges: [] };
       current.ranges.push(...rangesFor(entry));
       byFile.set(name, current);

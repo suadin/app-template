@@ -19,17 +19,27 @@ const METRICS = {
   },
 };
 
-async function open(page) {
+async function open(page, latest = '1.1.0') {
   await page.route('**/test-metrics.json', (route) => route.fulfill({ json: METRICS }));
+  if (latest === null) {
+    await page.route('**/version.json', (route) => route.abort());
+  } else {
+    await page.route('**/version.json', (route) =>
+      route.fulfill({ json: { version: latest, releasedAt: '2026-10-27', url: '#' }, headers: { 'access-control-allow-origin': '*' } }),
+    );
+  }
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Lorem Ipsum');
+  await expect(page.locator('#app-version')).toHaveText('1.0.0');
 }
 
-test('[BASIC-FOOTER-01] footer shows four icons', async ({ page }) => {
+test('[BASIC-FOOTER-01] footer shows six icons', async ({ page }) => {
   await open(page);
-  await expect(page.locator('.footer-items .footer-item')).toHaveCount(4);
-  await expect(page.locator('.footer-items svg')).toHaveCount(4);
-  const icons = await page.locator('.footer-items svg').evaluateAll((nodes) => nodes.map((node) => node.innerHTML));
+  await expect(page.locator('.footer-items .footer-item')).toHaveCount(6);
+  const icons = await page.locator('.footer-items svg, .footer-items img').evaluateAll((nodes) =>
+    nodes.map((node) => node.outerHTML),
+  );
+  expect(icons).toHaveLength(6);
   expect(new Set(icons).size).toBe(icons.length);
 });
 
@@ -51,7 +61,7 @@ test('[BASIC-READER-01] README opens the reader', async ({ page }) => {
   await open(page);
   await page.locator('#readme').click();
   await expect(page.locator('#reader')).toBeVisible();
-  await expect(page.locator('.reader-tab')).toHaveCount(4);
+  await expect(page.locator('.reader-tab')).toHaveCount(3);
   await expect(page.locator('.reader-section').first()).toBeVisible();
   await expect(page.locator('header')).toBeVisible();
   await expect(page.locator('footer')).toBeVisible();
@@ -91,7 +101,7 @@ test('[BASIC-FOOTER-04] the footer is fixed and wraps cleanly', async ({ page })
   const footer = page.locator('footer');
   await expect(footer).toBeVisible();
   expect(await footer.evaluate((node) => getComputedStyle(node).position)).toBe('fixed');
-  await expect(page.locator('.footer-items .footer-item')).toHaveCount(4);
+  await expect(page.locator('.footer-items .footer-item')).toHaveCount(6);
 });
 
 test('[BASIC-LAYOUT-02] the header is one row', async ({ page }) => {
@@ -118,4 +128,45 @@ test('[BASIC-DESIGN-04] the root stays at 100%', async ({ page }) => {
 test('[BASIC-DATES-01] dates use yyyy-mm-dd hh:mm', async ({ page }) => {
   await open(page);
   await expect(page.locator('time')).toHaveText(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/);
+});
+
+test('[BASIC-READER-05] SPECS starts with Changelog', async ({ page }) => {
+  await open(page);
+  await page.locator('#specs').click();
+  await expect(page).toHaveURL(/#\/docs\/app-specs$/);
+  await expect(page.locator('.reader-tab')).toHaveText(['README', 'SPECS', 'BASIC SPECS']);
+  await expect(page.locator('#reader-section-title')).toHaveText('Changelog');
+  await expect(page.locator('.reader-section').first()).toHaveAttribute('data-tip', 'Changelog');
+  await expect(page.locator('#reader-body')).toContainText('1.0.0');
+});
+
+test('[BASIC-VERSION-01] the app version opens SPECS and stays neutral', async ({ page }) => {
+  await open(page, '2.0.0');
+  await expect(page.locator('#specs')).not.toHaveClass(/outdated/);
+  await expect(page.locator('#specs')).toHaveAttribute('data-tip', 'app-template 1.0.0 — open SPECS');
+  await page.locator('#specs').click();
+  await expect(page).toHaveURL(/#\/docs\/app-specs$/);
+});
+
+test('[BASIC-VERSION-02] the Basic Specs version opens BASIC SPECS', async ({ page }) => {
+  await open(page);
+  await expect(page.locator('#basic-version')).toHaveText('1.1.0');
+  await page.locator('#basic-specs').click();
+  await expect(page).toHaveURL(/#\/docs\/basic-specs$/);
+  await expect(page.locator('#reader-title')).toHaveText('BASIC SPECS');
+});
+
+test('[BASIC-VERSION-03] only a major update turns red', async ({ page }) => {
+  await open(page, '1.2.0');
+  await expect(page.locator('#basic-specs')).not.toHaveClass(/outdated/);
+  await expect(page.locator('#basic-specs')).toHaveAttribute('data-tip', /1\.2\.0 available/);
+  await open(page, '2.0.0');
+  await expect(page.locator('#basic-specs')).toHaveClass(/outdated/);
+  await expect(page.locator('#basic-specs')).toHaveAttribute('data-tip', /2\.0\.0 available/);
+});
+
+test('[BASIC-VERSION-04] an unavailable latest version stays neutral', async ({ page }) => {
+  await open(page, null);
+  await expect(page.locator('#basic-specs')).not.toHaveClass(/outdated/);
+  await expect(page.locator('#basic-specs')).toHaveAttribute('data-tip', /latest not checked/);
 });

@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.1.0",
   "scripts": {
     "start": "python3 -m http.server 4173 --directory site",
-    "test": "node --test --experimental-test-coverage --test-coverage-include='site/logic.js' --test-coverage-include='site/reader.js' test/*.test.js",
+    "test": "node --test --experimental-test-coverage --test-coverage-include='site/logic.js' --test-coverage-include='site/reader.js' --test-coverage-include='site/version.js' test/*.test.js",
     "test:e2e": "playwright test --config e2e/playwright.config.js",
     "metrics": "node scripts/metrics.mjs",
     "check:docs": "node check-docs.mjs",

@@ -1,12 +1,21 @@
 import { docsHash, parseRoute, renderMarkdown, splitDocument, uniqueIcons } from './reader.js';
 import { metricLabel, parseMode, tipFor } from './logic.js';
+import { LATEST_URL, appVersionTip, basicVersionTip, updateState } from './version.js';
 
 const DOCS = [
   ['readme', 'README', 'docs/README.md'],
-  ['app-specs', 'APP SPECS', 'docs/APP-SPECS.md'],
+  ['app-specs', 'SPECS', 'docs/APP-SPECS.md', 'docs/RELEASE-NOTES.md'],
   ['basic-specs', 'BASIC SPECS', 'docs/BASIC-SPECS.md'],
-  ['release-notes', 'RELEASE NOTES', 'docs/RELEASE-NOTES.md'],
 ];
+
+function composeSpecs(appSpecs, releaseNotes) {
+  const notes = releaseNotes
+    .replace(/^#\s+.*$/m, '')
+    .replace(/^##\s+/gm, '### ')
+    .trim();
+  const rules = appSpecs.replace(/^#\s+.*$/m, '').trim();
+  return `# SPECS\n\n## Changelog\n\n${notes}\n\n${rules}\n`;
+}
 
 const ICONS = {
   book: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5v-13Z"/><path d="M8 8h8M8 12h8"/>',
@@ -50,9 +59,14 @@ function icon(name, size = 16) {
 }
 
 async function loadDocs() {
-  state.docs = await Promise.all(DOCS.map(async ([slug, title, file]) => {
+  state.docs = await Promise.all(DOCS.map(async ([slug, title, file, changelog]) => {
     const response = await fetch(file);
-    return splitDocument({ slug, title, markdown: await response.text() });
+    let markdown = await response.text();
+    if (changelog) {
+      const notes = await fetch(changelog);
+      markdown = composeSpecs(markdown, await notes.text());
+    }
+    return splitDocument({ slug, title, markdown });
   }));
   for (const doc of state.docs) state.byslug[doc.slug] = doc;
 }
@@ -170,6 +184,37 @@ async function loadMetrics() {
   }
 }
 
+async function fetchJson(url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 3000);
+  try {
+    const response = await fetch(url, { cache: 'no-store', signal: controller.signal });
+    return response.ok ? await response.json() : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function loadVersions() {
+  const runtime = await fetchJson('basic-specs.json');
+  const latest = await fetchJson(LATEST_URL);
+  if (!runtime) return;
+  const app = document.querySelector('#specs');
+  const appLabel = document.querySelector('#app-version');
+  const basic = document.querySelector('#basic-specs');
+  const basicLabel = document.querySelector('#basic-version');
+  const state = updateState(runtime.standard, latest?.version);
+  appLabel.textContent = runtime.appVersion;
+  app.dataset.tip = appVersionTip(runtime.app, runtime.appVersion);
+  app.setAttribute('aria-label', `${runtime.app} ${runtime.appVersion}, open SPECS`);
+  basicLabel.textContent = runtime.standard;
+  basic.dataset.tip = basicVersionTip(runtime.standard, latest?.version, state);
+  basic.setAttribute('aria-label', basic.dataset.tip.replace(/\n/g, ', '));
+  basic.classList.toggle('outdated', state === 'major');
+}
+
 function renderMode() {
   const mode = parseMode(location.hash);
   for (const button of document.querySelectorAll('.mode')) {
@@ -180,6 +225,12 @@ function renderMode() {
 
 document.querySelector('#readme').addEventListener('click', () => {
   location.hash = docsHash('readme');
+});
+document.querySelector('#specs').addEventListener('click', () => {
+  location.hash = docsHash('app-specs');
+});
+document.querySelector('#basic-specs').addEventListener('click', () => {
+  location.hash = docsHash('basic-specs');
 });
 for (const button of document.querySelectorAll('.mode')) {
   button.addEventListener('click', () => {
@@ -201,4 +252,5 @@ window.addEventListener('popstate', route);
 
 await loadDocs();
 await loadMetrics();
+await loadVersions();
 route();

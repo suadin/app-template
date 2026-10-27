@@ -25,6 +25,7 @@ const unit = spawnSync(
     '--test-coverage-include=site/logic.js',
     '--test-coverage-include=site/reader.js',
     'test/reader.test.js',
+    'test/version.test.js',
   ],
   { cwd: root, encoding: 'utf8' },
 );
