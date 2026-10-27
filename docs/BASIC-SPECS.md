@@ -2,9 +2,10 @@
 # Basic specs
 
 The reusable base for a small web app whose primary reader is a future AI session.
-Project rules stay in the app and never weaken a rule here. A rule that does not apply
-is named with its ID, a reason and a review date in `basics.json`; it is never dropped
-silently.
+Project rules stay in the app and never weaken a rule here. See
+[README](../README.md#overview) for setup, operation and deployment. A rule that does
+not apply is named with its ID, a reason and a review date in `basics.json`; it is never
+dropped silently.
 
 ## Documents
 
@@ -130,21 +131,21 @@ None.
 
 ### Automated tests
 
-- `BASIC-READER-01` — [BASIC-READER-01] README opens the reader
-- `BASIC-READER-02` — [BASIC-READER-02] a heading becomes a slug
-- `BASIC-READER-02` — [BASIC-READER-02] a document is split at level-two headings
-- `BASIC-READER-03` — [BASIC-READER-03] sections pick an icon and fall back to a dot
-- `BASIC-READER-04` — [BASIC-READER-04] html is escaped before markup is added
-- `BASIC-FOOTER-01` — [BASIC-FOOTER-01] footer shows four icons
-- `BASIC-FOOTER-02` — [BASIC-FOOTER-02] metric labels show count and coverage
-- `BASIC-FOOTER-02` — [BASIC-FOOTER-02] footer shows counts and coverage
-- `BASIC-FOOTER-03` — [BASIC-FOOTER-03] tooltip has three rows
-- `BASIC-FOOTER-04` — [BASIC-FOOTER-04] the footer is fixed and wraps cleanly
-- `BASIC-LINKS-01` — [BASIC-LINKS-01] mode lives in the address
-- `BASIC-LINKS-01` — [BASIC-LINKS-01] a reload restores the reader section
-- `BASIC-LAYOUT-01` — [BASIC-LAYOUT-01] header and footer stay visible
-- `BASIC-LAYOUT-02` — [BASIC-LAYOUT-02] the header is one row
-- `BASIC-DESIGN-01` — [BASIC-DESIGN-01] the page follows the OS colour scheme
-- `BASIC-DESIGN-02` — [BASIC-DESIGN-02] focus uses the green outline
-- `BASIC-DESIGN-04` — [BASIC-DESIGN-04] the root stays at 100%
-- `BASIC-DATES-01` — [BASIC-DATES-01] dates use yyyy-mm-dd hh:mm
+- `[BASIC-READER-01] README opens the reader`
+- `[BASIC-READER-02] a heading becomes a slug`
+- `[BASIC-READER-02] a document is split at level-two headings`
+- `[BASIC-READER-03] sections pick an icon and fall back to a dot`
+- `[BASIC-READER-04] html is escaped before markup is added`
+- `[BASIC-FOOTER-01] footer shows four icons`
+- `[BASIC-FOOTER-02] metric labels show count and coverage`
+- `[BASIC-FOOTER-02] footer shows counts and coverage`
+- `[BASIC-FOOTER-03] tooltip has three rows`
+- `[BASIC-FOOTER-04] the footer is fixed and wraps cleanly`
+- `[BASIC-LINKS-01] mode lives in the address`
+- `[BASIC-LINKS-01] a reload restores the reader section`
+- `[BASIC-LAYOUT-01] header and footer stay visible`
+- `[BASIC-LAYOUT-02] the header is one row`
+- `[BASIC-DESIGN-01] the page follows the OS colour scheme`
+- `[BASIC-DESIGN-02] focus uses the green outline`
+- `[BASIC-DESIGN-04] the root stays at 100%`
+- `[BASIC-DATES-01] dates use yyyy-mm-dd hh:mm`
