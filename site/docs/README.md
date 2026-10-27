@@ -23,7 +23,8 @@ pnpm check
 ```
 
 `pnpm check` runs the unit suite, the Playwright suite, the metrics and the Basic
-Specs check. A green run means the starter still follows the standard.
+Specs check. A green run means the starter still follows the standard. The weekly
+`Basics update` workflow syncs a new release and opens a pull request.
 
 ## What to replace
 
