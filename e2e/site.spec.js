@@ -1,4 +1,14 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from './fixtures.js';
+
+// The standard moves; the suite must not. Both versions come from the app's own
+// runtime metadata, so a Basic Specs release never breaks a green suite again.
+const RUNTIME = JSON.parse(readFileSync(new URL('../site/basic-specs.json', import.meta.url)));
+const STANDARD = RUNTIME.standard;
+const APP_VERSION = RUNTIME.appVersion;
+const [MAJOR, MINOR] = STANDARD.split('.').map(Number);
+const NEXT_MINOR = `${MAJOR}.${MINOR + 1}.0`;
+const NEXT_MAJOR = `${MAJOR + 1}.0.0`;
 
 const METRICS = {
   unit: {
@@ -19,7 +29,7 @@ const METRICS = {
   },
 };
 
-async function open(page, latest = '1.1.1') {
+async function open(page, latest = STANDARD) {
   await page.route('**/test-metrics.json', (route) => route.fulfill({ json: METRICS }));
   if (latest === null) {
     await page.route('**/version.json', (route) => route.abort());
@@ -30,7 +40,7 @@ async function open(page, latest = '1.1.1') {
   }
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Lorem Ipsum');
-  await expect(page.locator('#app-version')).toHaveText('1.0.0');
+  await expect(page.locator('#app-version')).toHaveText(APP_VERSION);
 }
 
 test('[BASIC-FOOTER-01] footer shows six icons', async ({ page }) => {
@@ -141,28 +151,30 @@ test('[BASIC-READER-05] SPECS starts with Changelog', async ({ page }) => {
 });
 
 test('[BASIC-VERSION-01] the app version opens SPECS and stays neutral', async ({ page }) => {
-  await open(page, '2.0.0');
+  await open(page, NEXT_MAJOR);
   await expect(page.locator('#specs')).not.toHaveClass(/outdated/);
-  await expect(page.locator('#specs')).toHaveAttribute('data-tip', 'app-template 1.0.0 — open SPECS');
+  await expect(page.locator('#specs')).toHaveAttribute('data-tip', `app-template ${APP_VERSION} — open SPECS`);
   await page.locator('#specs').click();
   await expect(page).toHaveURL(/#\/docs\/app-specs$/);
 });
 
 test('[BASIC-VERSION-02] the Basic Specs version opens BASIC SPECS', async ({ page }) => {
   await open(page);
-  await expect(page.locator('#basic-version')).toHaveText('1.1.1');
+  await expect(page.locator('#basic-version')).toHaveText(STANDARD);
   await page.locator('#basic-specs').click();
   await expect(page).toHaveURL(/#\/docs\/basic-specs$/);
   await expect(page.locator('#reader-title')).toHaveText('BASIC SPECS');
 });
 
 test('[BASIC-VERSION-03] only a major update turns red', async ({ page }) => {
-  await open(page, '1.2.0');
+  await open(page, NEXT_MINOR);
   await expect(page.locator('#basic-specs')).not.toHaveClass(/outdated/);
-  await expect(page.locator('#basic-specs')).toHaveAttribute('data-tip', /1\.2\.0 available/);
-  await open(page, '2.0.0');
+  await expect(page.locator('#basic-specs')).toHaveAttribute(
+    'data-tip', new RegExp(`${NEXT_MINOR.replaceAll('.', '\\.')} available`));
+  await open(page, NEXT_MAJOR);
   await expect(page.locator('#basic-specs')).toHaveClass(/outdated/);
-  await expect(page.locator('#basic-specs')).toHaveAttribute('data-tip', /2\.0\.0 available/);
+  await expect(page.locator('#basic-specs')).toHaveAttribute(
+    'data-tip', new RegExp(`${NEXT_MAJOR.replaceAll('.', '\\.')} available`));
 });
 
 test('[BASIC-VERSION-04] an unavailable latest version stays neutral', async ({ page }) => {
